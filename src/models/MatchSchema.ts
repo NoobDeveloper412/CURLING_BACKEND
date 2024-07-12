@@ -9,7 +9,7 @@ const matchSchema = new Schema(
     end: { type: Number, required: true },
     rock: { type: Number, required: true },
   },
-  { timestamps: true, strict: false }
+  { timestamps: true, strict: false },
 );
 
 const Match = model("Match", matchSchema);
