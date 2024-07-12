@@ -8,7 +8,6 @@ const matchSchema = new Schema(
     team2: { type: String, required: true },
     end: { type: Number, required: true },
     rock: { type: Number, required: true },
-    // Define additional fields dynamically
   },
   { timestamps: true, strict: false }
 );
