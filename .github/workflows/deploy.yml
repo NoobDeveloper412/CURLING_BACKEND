@@ -1,19 +1,16 @@
-# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
-
 name: Node.js CI/CD
 
 on:
   push:
-    branches: ["main"]
+    branches:
+      - main
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: self-hosted
     strategy:
       matrix:
         node-version: [16.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
     steps:
       - uses: actions/checkout@v3
       - name: Use Node.js ${{ matrix.node-version }}
@@ -22,9 +19,22 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
       - run: npm ci
-      - run: |
+      - name: Setup Environment Variables
+        run: |
           touch .env
           echo "${{ secrets.PROD_ENV_FILE }}" > .env
-      - run:
-          pm2 restart Curling-backend || pm2 start src/app.ts --name Curling-backend --interpreter node &&
-          pm2 save
+      - name: Deploy to EC2
+        env:
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+          EC2_USER: ${{ secrets.EC2_USER }}
+          EC2_KEY: ${{ secrets.EC2_KEY }}
+        run: |
+          echo "${{ secrets.EC2_KEY }}" > /tmp/ec2_key
+          chmod 600 /tmp/ec2_key
+          ssh -o StrictHostKeyChecking=no -i /tmp/ec2_key $EC2_USER@$EC2_HOST "
+            cd ~/CURLING_BACKEND &&
+            git pull origin main &&
+            npm install &&
+            pm2 restart Curling-backend || pm2 start src/app.ts --name Curling-backend --interpreter node &&
+            pm2 save
+          "
