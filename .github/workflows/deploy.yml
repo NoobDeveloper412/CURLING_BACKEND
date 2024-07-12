@@ -39,17 +39,3 @@ jobs:
             pm2 start npm --name Curling-backend -- run dev &&
             pm2 save
           "
-
- server {
-        listen 80;
-
-        server_name 3.86.24.107;
-
-        location / {
-            proxy_pass http://127.0.0.1:3000;  # Ensure this matches the port your Node.js app is listening on
-            proxy_http_version 1.1;
-            proxy_set_header Upgrade $http_upgrade;
-            proxy_set_header Connection 'upgrade';
-            proxy_set_header Host $host;
-            proxy_cache_bypass $http_upgrade;
-        }
