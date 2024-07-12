@@ -25,4 +25,6 @@ jobs:
       - run: |
           touch .env
           echo "${{ secrets.PROD_ENV_FILE }}" > .env
-      - run: pm2 restart BackendAPI
+      - run:
+          pm2 startOrRestart src/app.ts --name Curling-backend --interpreter node &&
+          pm2 save
