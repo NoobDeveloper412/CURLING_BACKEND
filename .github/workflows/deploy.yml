@@ -35,8 +35,7 @@ jobs:
             cd ~/actions-runner/_work/CURLING_BACKEND/CURLING_BACKEND &&
             git pull origin main &&
             npm install &&
-            npm run dev  &&
+            pm2 delete Curling-backend || true &&
+            pm2 start npm --name Curling-backend -- run dev &&
             pm2 save
           "
-
-# pm2 restart Curling-backend || pm2 start npm --name Curling-backend -- run dev &&
